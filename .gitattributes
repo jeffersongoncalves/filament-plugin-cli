@@ -1,0 +1,8 @@
+* text=auto eol=lf
+/.github export-ignore
+CHANGELOG.md export-ignore
+/tests export-ignore
+phpunit.xml.dist export-ignore
+phpstan.neon.dist export-ignore
+box.json export-ignore
+cliff.toml export-ignore
