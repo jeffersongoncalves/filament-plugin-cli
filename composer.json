@@ -55,5 +55,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["filament-plugin"]
+    "bin": ["builds/filament-plugin"]
 }
