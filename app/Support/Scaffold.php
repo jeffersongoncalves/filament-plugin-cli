@@ -5,17 +5,28 @@ namespace App\Support;
 class Scaffold
 {
     /**
-     * filament version, php floor, orchestra/testbench range and the CI
-     * Laravel version to test, per branch. See jeffersongoncalves' own
-     * filament-plugin-creator skill for where these floors come from.
+     * php floor, orchestra/testbench range and the CI Laravel version to
+     * test, per Filament major. Branch NAMING is always sequential
+     * (1.x, 2.x, 3.x, ...) and independent of which Filament major each
+     * branch targets — that mapping is chosen at scaffold time via
+     * --filament-version/--to-filament-version, not hardcoded. See
+     * jeffersongoncalves' own filament-plugin-creator skill for where these
+     * floors come from.
      */
-    public const BRANCHES = [
-        '1.x' => ['filament' => '^3.0', 'php' => '^8.1', 'testbench' => '^8.0|^9.0', 'ciLaravel' => '12.*', 'version' => 3],
-        '2.x' => ['filament' => '^4.0', 'php' => '^8.2', 'testbench' => '^9.0|^10.0', 'ciLaravel' => '12.*', 'version' => 4],
-        '3.x' => ['filament' => '^5.0', 'php' => '^8.2', 'testbench' => '^10.0|^11.0', 'ciLaravel' => '13.*', 'version' => 5],
+    public const FILAMENT_VERSIONS = [
+        3 => ['filament' => '^3.0', 'php' => '^8.1', 'testbench' => '^8.0|^9.0', 'ciLaravel' => '12.*'],
+        4 => ['filament' => '^4.0', 'php' => '^8.2', 'testbench' => '^9.0|^10.0', 'ciLaravel' => '12.*'],
+        5 => ['filament' => '^5.0', 'php' => '^8.2', 'testbench' => '^10.0|^11.0', 'ciLaravel' => '13.*'],
     ];
 
-    public const ALL_BRANCHES = ['1.x', '2.x', '3.x'];
+    public const MIN_FILAMENT_VERSION = 3;
+
+    public const MAX_FILAMENT_VERSION = 5;
+
+    public static function branchName(int $index): string
+    {
+        return ($index + 1).'.x';
+    }
 
     public static function studly(string $value): string
     {
@@ -249,9 +260,9 @@ class Scaffold
         YAML;
     }
 
-    public static function testsYml(string $branch): string
+    public static function testsYml(string $branch, int $filamentMajor): string
     {
-        $v = self::BRANCHES[$branch];
+        $v = self::FILAMENT_VERSIONS[$filamentMajor];
 
         return <<<YAML
         name: Tests
@@ -340,9 +351,9 @@ class Scaffold
         MD;
     }
 
-    public static function filamentComposerJson(string $vendor, string $package, string $namespace, string $serviceProvider, string $description, string $branch): array
+    public static function filamentComposerJson(string $vendor, string $package, string $namespace, string $serviceProvider, string $description, int $filamentMajor): array
     {
-        $v = self::BRANCHES[$branch];
+        $v = self::FILAMENT_VERSIONS[$filamentMajor];
 
         return [
             'name' => "$vendor/$package",

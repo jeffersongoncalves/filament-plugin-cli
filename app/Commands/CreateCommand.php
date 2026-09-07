@@ -19,15 +19,17 @@ class CreateCommand extends Command
     protected $signature = 'create
         {vendor-package : vendor/package, e.g. jeffersongoncalves/filament-settings}
         {description? : short description of the plugin}
-        {--branch=1.x : starting branch (1.x, 2.x or 3.x) when --all-branches is not set}
-        {--all-branches : scaffold 1.x, 2.x and 3.x in sequence (2.x built off 1.x, 3.x off 2.x)}
+        {--branch=1.x : branch name for the single-branch case (ignored when --all-branches is set)}
+        {--filament-version=3 : Filament major (3, 4 or 5) for the starting/single branch}
+        {--to-filament-version= : Filament major to end at when --all-branches is set (default: 5)}
+        {--all-branches : scaffold sequential branches spanning --filament-version..--to-filament-version (2.x built off 1.x, 3.x off 2.x, ...) — e.g. --filament-version=3 covers 1.x->5.x, --filament-version=4 --to-filament-version=4 covers only 1.x->4.x}
         {--path= : target directory (default: ./<package> under cwd)}
         {--author= : defaults to `git config user.name`}
         {--email= : defaults to `git config user.email`}
         {--no-git : skip git init/commit}
         {--dry-run : print planned actions, write nothing}';
 
-    protected $description = 'Scaffold a new open-source Filament plugin with multi-branch (1.x/2.x/3.x) git already configured.';
+    protected $description = 'Scaffold a new open-source Filament plugin with multi-branch git already configured (branch-to-Filament-major mapping controlled by --filament-version/--to-filament-version).';
 
     public function handle(): int
     {
@@ -43,14 +45,35 @@ class CreateCommand extends Command
         $dryRun = (bool) $this->option('dry-run');
         $noGit = (bool) $this->option('no-git');
 
-        $branches = $this->option('all-branches') ? Scaffold::ALL_BRANCHES : [(string) $this->option('branch')];
-        foreach ($branches as $b) {
-            if (! isset(Scaffold::BRANCHES[$b])) {
-                $this->components->error("Unknown branch: {$b} (expected 1.x, 2.x or 3.x)");
+        $filamentVersion = (int) $this->option('filament-version');
+        if ($filamentVersion < Scaffold::MIN_FILAMENT_VERSION || $filamentVersion > Scaffold::MAX_FILAMENT_VERSION) {
+            $this->components->error('--filament-version must be between '.Scaffold::MIN_FILAMENT_VERSION.' and '.Scaffold::MAX_FILAMENT_VERSION.", got: {$filamentVersion}");
 
-                return self::FAILURE;
-            }
+            return self::FAILURE;
         }
+
+        $toOption = $this->option('to-filament-version');
+        $toFilamentVersion = $toOption !== null ? (int) $toOption : Scaffold::MAX_FILAMENT_VERSION;
+        if ($toFilamentVersion < Scaffold::MIN_FILAMENT_VERSION || $toFilamentVersion > Scaffold::MAX_FILAMENT_VERSION) {
+            $this->components->error('--to-filament-version must be between '.Scaffold::MIN_FILAMENT_VERSION.' and '.Scaffold::MAX_FILAMENT_VERSION.", got: {$toFilamentVersion}");
+
+            return self::FAILURE;
+        }
+        if ($toFilamentVersion < $filamentVersion) {
+            $this->components->error('--to-filament-version must be >= --filament-version');
+
+            return self::FAILURE;
+        }
+
+        if ($this->option('all-branches')) {
+            $plan = [];
+            foreach (range($filamentVersion, $toFilamentVersion) as $i => $major) {
+                $plan[] = ['branch' => Scaffold::branchName($i), 'filament' => $major];
+            }
+        } else {
+            $plan = [['branch' => (string) $this->option('branch'), 'filament' => $filamentVersion]];
+        }
+        $branchNames = array_column($plan, 'branch');
 
         $namespace = Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
         $serviceProvider = Scaffold::studly($package).'ServiceProvider';
@@ -95,11 +118,12 @@ class CreateCommand extends Command
                 : "git {$cmd} ok";
         };
 
-        foreach ($branches as $i => $branch) {
-            $version = Scaffold::BRANCHES[$branch]['version'];
+        foreach ($plan as $i => $step) {
+            $branch = $step['branch'];
+            $major = $step['filament'];
 
             if ($i === 0) {
-                $this->scaffoldSharedFiles($dir, $vendor, $package, $namespace, $serviceProvider, $pluginClass, $title, $description, $author, $year, $write);
+                $this->scaffoldSharedFiles($dir, $vendor, $package, $namespace, $serviceProvider, $pluginClass, $title, $description, $author, $year, $branchNames, $write);
                 if (! $noGit) {
                     $gitRun('init -q');
                     $gitRun("checkout -q -B {$branch}");
@@ -108,8 +132,8 @@ class CreateCommand extends Command
                 $gitRun("checkout -q -b {$branch}");
             }
 
-            $write('composer.json', json_encode(Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, $description, $branch), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n", force: true);
-            $write('.github/workflows/tests.yml', Scaffold::testsYml($branch), force: true);
+            $write('composer.json', json_encode(Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, $description, $major), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n", force: true);
+            $write('.github/workflows/tests.yml', Scaffold::testsYml($branch, $major), force: true);
 
             if (! $dryRun) {
                 File::delete($dir.'/composer.lock');
@@ -118,13 +142,13 @@ class CreateCommand extends Command
             if (! $noGit) {
                 $gitRun('add .');
                 $msg = $i === 0
-                    ? "feat: scaffold plugin structure ({$branch}, Filament v{$version})"
-                    : "feat: upgrade to Filament v{$version} compatibility";
+                    ? "feat: scaffold plugin structure ({$branch}, Filament v{$major})"
+                    : "feat: upgrade to Filament v{$major} compatibility";
                 $gitRun('commit -q -m "'.$msg.'"');
             }
         }
 
-        $this->components->info(($dryRun ? '[dry-run] ' : '')."Scaffolded {$vendor}/{$package} at {$dir} (branches: ".implode(', ', $branches).')');
+        $this->components->info(($dryRun ? '[dry-run] ' : '')."Scaffolded {$vendor}/{$package} at {$dir} (branches: ".implode(', ', $branchNames).')');
         foreach ($files as $line) {
             $this->line("  {$line}");
         }
@@ -139,7 +163,7 @@ class CreateCommand extends Command
             'vendor/bin/phpstan analyse',
             'vendor/bin/pint',
             "gh repo create {$vendor}/{$package} --public --source={$dir} --remote=origin --push",
-            'set the default branch on GitHub to the lowest scaffolded branch (e.g. 1.x)',
+            'set the default branch on GitHub to the lowest scaffolded branch (e.g. '.$branchNames[0].')',
         ] as $step) {
             $this->line("  - {$step}");
         }
@@ -147,7 +171,7 @@ class CreateCommand extends Command
         return self::SUCCESS;
     }
 
-    private function scaffoldSharedFiles(string $dir, string $vendor, string $package, string $namespace, string $serviceProvider, string $pluginClass, string $title, string $description, string $author, string $year, \Closure $write): void
+    private function scaffoldSharedFiles(string $dir, string $vendor, string $package, string $namespace, string $serviceProvider, string $pluginClass, string $title, string $description, string $author, string $year, array $branchNames, \Closure $write): void
     {
         $write('.editorconfig', Scaffold::editorconfig());
         $write('.gitattributes', Scaffold::gitattributes());
@@ -285,8 +309,8 @@ class CreateCommand extends Command
 
         PHP);
 
-        $write('.github/workflows/pint.yml', Scaffold::workflowPint([...Scaffold::ALL_BRANCHES, 'main']));
-        $write('.github/workflows/phpstan.yml', Scaffold::workflowPhpstan([...Scaffold::ALL_BRANCHES, 'main']));
+        $write('.github/workflows/pint.yml', Scaffold::workflowPint([...$branchNames, 'main']));
+        $write('.github/workflows/phpstan.yml', Scaffold::workflowPhpstan([...$branchNames, 'main']));
         $write('.github/workflows/update-changelog.yml', Scaffold::workflowChangelog());
     }
 }

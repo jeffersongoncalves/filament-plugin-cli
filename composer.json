@@ -1,14 +1,14 @@
 {
     "name": "jeffersongoncalves/filament-plugin-cli",
-    "description": "Scaffold new open-source Filament plugins with multi-branch git already configured (1.x/2.x/3.x for Filament v3/v4/v5), built with Laravel Zero. Designed to be driven non-interactively (by an AI agent or a script) via arguments and flags.",
+    "description": "Scaffold new open-source Filament plugins with multi-branch git already configured (branch-to-Filament-major mapping controlled by --filament-version/--to-filament-version), built with Laravel Zero. Designed to be driven non-interactively (by an AI agent or a script) via arguments and flags.",
     "keywords": ["laravel", "filament", "cli", "laravel-zero", "filament-plugin", "scaffold", "spatie", "devtools"],
     "homepage": "https://github.com/jeffersongoncalves/filament-plugin-cli",
     "type": "project",
     "license": "MIT",
     "authors": [
         {
-            "name": "Jefferson Goncalves",
-            "email": "jeff@jeffersongoncalves.com"
+            "name": "Jefferson Simão Gonçalves",
+            "email": "gerson.simao.92@gmail.com"
         }
     ],
     "require": {

@@ -16,12 +16,13 @@ class BranchCommand extends Command
      */
     protected $signature = 'branch
         {vendor-package : vendor/package, e.g. jeffersongoncalves/filament-settings}
-        {--branch= : branch to create (1.x, 2.x or 3.x), required}
+        {--branch= : name of the branch to create (any name, e.g. 2.x), required}
+        {--filament-version= : Filament major (3, 4 or 5) this branch targets, required}
         {--path= : existing plugin repo, required}
         {--from= : branch to branch off (default: current HEAD)}
         {--dry-run : print planned actions, write nothing}';
 
-    protected $description = 'Add a new Filament-version branch (1.x/2.x/3.x) to an existing plugin repo.';
+    protected $description = 'Add a new Filament-version branch to an existing plugin repo.';
 
     public function handle(): int
     {
@@ -37,8 +38,14 @@ class BranchCommand extends Command
         $dir = $this->option('path');
         $dryRun = (bool) $this->option('dry-run');
 
-        if ($branch === '' || ! isset(Scaffold::BRANCHES[$branch])) {
-            $this->components->error('A valid --branch=1.x|2.x|3.x is required');
+        if ($branch === '') {
+            $this->components->error('--branch=NAME is required');
+
+            return self::FAILURE;
+        }
+        $version = (int) $this->option('filament-version');
+        if (! $this->option('filament-version') || $version < Scaffold::MIN_FILAMENT_VERSION || $version > Scaffold::MAX_FILAMENT_VERSION) {
+            $this->components->error('--filament-version must be between '.Scaffold::MIN_FILAMENT_VERSION.' and '.Scaffold::MAX_FILAMENT_VERSION);
 
             return self::FAILURE;
         }
@@ -50,7 +57,6 @@ class BranchCommand extends Command
 
         $namespace = Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
         $serviceProvider = Scaffold::studly($package).'ServiceProvider';
-        $version = Scaffold::BRANCHES[$branch]['version'];
 
         $git = [];
         $gitRun = function (string $cmd) use ($dir, $dryRun, &$git): void {
@@ -71,7 +77,7 @@ class BranchCommand extends Command
         $gitRun("checkout -q -b {$branch}");
 
         $composerPath = $dir.'/composer.json';
-        $composerJson = Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, '', $branch);
+        $composerJson = Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, '', $version);
         $files = [];
         if ($dryRun) {
             $files[] = 'write (force, dry-run) composer.json';
@@ -80,7 +86,7 @@ class BranchCommand extends Command
             File::put($composerPath, json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
             $files[] = 'write (force) composer.json';
             File::ensureDirectoryExists($dir.'/.github/workflows');
-            File::put($dir.'/.github/workflows/tests.yml', Scaffold::testsYml($branch));
+            File::put($dir.'/.github/workflows/tests.yml', Scaffold::testsYml($branch, $version));
             $files[] = 'write (force) .github/workflows/tests.yml';
             File::delete($dir.'/composer.lock');
         }
