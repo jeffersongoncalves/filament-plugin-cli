@@ -115,6 +115,19 @@ filament-plugin branch jeffersongoncalves/filament-settings --branch=2.x --filam
 
 Every argument/option is designed for scripted, non-interactive invocation — no prompts are ever shown.
 
+Update the CLI to the latest release (PHAR installs only — Git/Composer installs must update via `git pull`/`composer update`):
+
+```bash
+filament-plugin self-update
+filament-plugin self-update --check
+```
+
+### `self-update` options
+
+| Option | Description |
+|--------|-------------|
+| `--check` | Only check for updates without installing |
+
 ## Testing
 
 ```bash
