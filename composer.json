@@ -15,6 +15,7 @@
         "php": "^8.3"
     },
     "require-dev": {
+        "jeffersongoncalves/laravel-zero-self-update": "^1.1",
         "laravel-zero/framework": "^13.0",
         "laravel/pint": "^1.25",
         "mockery/mockery": "^1.6",
