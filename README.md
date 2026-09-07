@@ -1,6 +1,6 @@
 <div class="filament-hidden">
 
-<!-- banner: art/jeffersongoncalves-filament-plugin-cli.png (generate via portfolio-banner skill) -->
+![Filament Plugin CLI](art/jeffersongoncalves-filament-plugin-cli.png)
 
 </div>
 
