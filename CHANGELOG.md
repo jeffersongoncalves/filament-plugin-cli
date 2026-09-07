@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-09-07
+
+### Bug Fixes
+
+- Point composer bin to prebuilt PHAR instead of source stub
+
 ## [1.0.2] - 2026-09-07
 
 ### Features
