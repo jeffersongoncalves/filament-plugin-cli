@@ -12,10 +12,10 @@
         }
     ],
     "require": {
-        "php": "^8.3",
-        "jeffersongoncalves/laravel-zero-package-scaffold": "^1.0"
+        "php": "^8.3"
     },
     "require-dev": {
+        "jeffersongoncalves/laravel-zero-package-scaffold": "^1.0",
         "jeffersongoncalves/laravel-zero-self-update": "^1.1",
         "laravel-zero/framework": "^13.0",
         "laravel/pint": "^1.25",
