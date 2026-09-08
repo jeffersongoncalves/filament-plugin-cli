@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2026-09-08
+
+### Refactor
+
+- Move the shared scaffold templates into laravel-zero-package-scaffold
+
 ## [1.0.6] - 2026-09-08
 
 ### Features
