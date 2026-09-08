@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.8] - 2026-09-08
+
+### Bug Fixes
+
+- Move the package-scaffold dependency to require-dev
+
+### Documentation
+
+- Document the shared vendornamespace.json in the namespace section
+
 ## [1.0.7] - 2026-09-08
 
 ### Refactor
