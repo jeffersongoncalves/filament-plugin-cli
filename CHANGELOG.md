@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2026-09-08
+
+### Documentation
+
+- Document self-update command in README
+
+### Features
+
+- Add --namespace, --keywords and --require to the create command
+
 ## [1.0.4] - 2026-09-07
 
 ### Bug Fixes
