@@ -4,8 +4,68 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f845140eb6b86ccb7a5c29a1c4d514a1",
-    "packages": [],
+    "content-hash": "532bbcb191487a81bbf33a81e23d5f8f",
+    "packages": [
+        {
+            "name": "jeffersongoncalves/laravel-zero-package-scaffold",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold.git",
+                "reference": "eb36caad8c0e3775d389bd807563bce988485a79"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-zero-package-scaffold/zipball/eb36caad8c0e3775d389bd807563bce988485a79",
+                "reference": "eb36caad8c0e3775d389bd807563bce988485a79",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.25",
+                "pestphp/pest": "^3.8|^4.1",
+                "phpstan/phpstan": "^2.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\LaravelZero\\PackageScaffold\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Goncalves",
+                    "email": "jeffersongoncalves@users.noreply.github.com"
+                }
+            ],
+            "description": "Shared file templates (LICENSE, CI workflows, phpstan/phpunit, README) and namespace-casing resolution for package generator CLIs.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold",
+            "keywords": [
+                "boilerplate",
+                "cli",
+                "generator",
+                "laravel-zero",
+                "namespace",
+                "scaffold"
+            ],
+            "support": {
+                "source": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-08T03:03:40+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "brianium/paratest",

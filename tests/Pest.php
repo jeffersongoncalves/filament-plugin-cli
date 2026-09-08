@@ -15,6 +15,11 @@ use Tests\TestCase;
 
 uses(TestCase::class)->in('Feature');
 
+// Never read the developer's real ~/.package/vendornamespace.json: the derived
+// namespaces would depend on whose machine the suite runs on. Tests that care
+// about the map point this at a fixture of their own.
+putenv('PACKAGE_NAMESPACES_FILE='.__DIR__.'/Fixtures/no-such-namespaces.json');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations

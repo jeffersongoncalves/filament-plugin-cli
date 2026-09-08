@@ -88,8 +88,8 @@ it('defaults to the nested Vendor\\Filament\\Name namespace', function () {
 
     $composer = json_decode(file_get_contents($dir.'/composer.json'), true);
 
-    expect($composer['autoload']['psr-4'])->toHaveKey('JeffersonGoncalves\\Filament\\CepField\\')
-        ->and($composer['extra']['laravel']['providers'])->toBe(['JeffersonGoncalves\\Filament\\CepField\\CepFieldServiceProvider'])
+    expect($composer['autoload']['psr-4'])->toHaveKey('Jeffersongoncalves\\Filament\\CepField\\')
+        ->and($composer['extra']['laravel']['providers'])->toBe(['Jeffersongoncalves\\Filament\\CepField\\CepFieldServiceProvider'])
         ->and(is_file($dir.'/src/CepFieldServiceProvider.php'))->toBeTrue()
         ->and(is_file($dir.'/src/CepFieldPlugin.php'))->toBeTrue()
         ->and(is_file($dir.'/config/filament-cep-field.php'))->toBeTrue();
