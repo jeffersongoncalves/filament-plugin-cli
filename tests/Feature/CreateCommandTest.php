@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\File;
+
 it('scaffolds a single branch in dry-run mode without touching disk', function () {
     $dir = sys_get_temp_dir().'/filament-plugin-cli-test-'.uniqid();
 
@@ -72,6 +74,35 @@ it('rejects a to-filament-version lower than filament-version', function () {
         '--path' => $dir,
         '--dry-run' => true,
     ])->assertExitCode(1);
+});
+
+it('honours --namespace, --keywords and --require', function () {
+    $dir = sys_get_temp_dir().'/filament-plugin-cli-test-'.uniqid();
+
+    $this->artisan('create', [
+        'vendor-package' => 'jeffersongoncalves/filament-ban',
+        '--path' => $dir,
+        '--namespace' => 'JeffersonGoncalves\\Filament\\Ban',
+        '--keywords' => 'laravel, filament, ban, bannable',
+        '--require' => 'cybercog/laravel-ban:^4.10',
+        '--author' => 'Jefferson Gonçalves',
+        '--email' => 'gerson.simao.92@gmail.com',
+        '--filament-version' => '5',
+        '--no-git' => true,
+    ])->assertExitCode(0);
+
+    $composer = json_decode(file_get_contents($dir.'/composer.json'), true);
+
+    expect($composer['autoload']['psr-4'])->toHaveKey('JeffersonGoncalves\\Filament\\Ban\\')
+        ->and($composer['extra']['laravel']['providers'])->toBe(['JeffersonGoncalves\\Filament\\Ban\\BanServiceProvider'])
+        ->and($composer['keywords'])->toBe(['laravel', 'filament', 'ban', 'bannable'])
+        ->and($composer['type'])->toBe('library')
+        ->and($composer['authors'])->toBe([['name' => 'Jefferson Gonçalves', 'email' => 'gerson.simao.92@gmail.com', 'role' => 'Developer']])
+        ->and($composer['require'])->toHaveKey('cybercog/laravel-ban')
+        ->and(is_file($dir.'/src/BanServiceProvider.php'))->toBeTrue()
+        ->and(is_file($dir.'/src/BanPlugin.php'))->toBeTrue();
+
+    File::deleteDirectory($dir);
 });
 
 it('rejects a vendor-package without a slash', function () {

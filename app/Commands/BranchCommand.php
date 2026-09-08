@@ -78,12 +78,22 @@ class BranchCommand extends Command
 
         $composerPath = $dir.'/composer.json';
         $composerJson = Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, '', $version);
+
+        // A branch is a version bump, not a fresh scaffold: keep whatever the source
+        // branch already declared (description, keywords, authors, extra deps) and
+        // patch only the constraints that the Filament major actually moves.
+        if (File::exists($composerPath) && is_array($existing = json_decode(File::get($composerPath), true))) {
+            $composerJson = array_replace_recursive($existing, [
+                'require' => array_intersect_key($composerJson['require'], ['php' => 1, 'filament/filament' => 1]),
+                'require-dev' => array_intersect_key($composerJson['require-dev'], ['orchestra/testbench' => 1]),
+            ]);
+        }
         $files = [];
         if ($dryRun) {
             $files[] = 'write (force, dry-run) composer.json';
             $files[] = 'write (force, dry-run) .github/workflows/tests.yml';
         } else {
-            File::put($composerPath, json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+            File::put($composerPath, json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n");
             $files[] = 'write (force) composer.json';
             File::ensureDirectoryExists($dir.'/.github/workflows');
             File::put($dir.'/.github/workflows/tests.yml', Scaffold::testsYml($branch, $version));
@@ -104,7 +114,6 @@ class BranchCommand extends Command
         $this->newLine();
         $this->components->info('Next steps:');
         foreach ([
-            'composer.json description was left blank — fill it in (branch/from didn\'t carry the original)',
             'rm -f composer.lock && composer install',
             'vendor/bin/pest',
             "git push -u origin {$branch}",

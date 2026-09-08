@@ -351,21 +351,27 @@ class Scaffold
         MD;
     }
 
-    public static function filamentComposerJson(string $vendor, string $package, string $namespace, string $serviceProvider, string $description, int $filamentMajor): array
+    /**
+     * @param  array<int, string>  $keywords
+     * @param  array<string, string>  $extraRequire
+     */
+    public static function filamentComposerJson(string $vendor, string $package, string $namespace, string $serviceProvider, string $description, int $filamentMajor, string $author = '', string $email = '', array $keywords = [], array $extraRequire = []): array
     {
         $v = self::FILAMENT_VERSIONS[$filamentMajor];
 
         return [
             'name' => "$vendor/$package",
             'description' => $description,
-            'keywords' => ['laravel', 'filament', 'filament-plugin', $package],
+            'keywords' => $keywords ?: ['laravel', 'filament', 'filament-plugin', $package],
             'homepage' => "https://github.com/$vendor/$package",
             'license' => 'MIT',
-            'require' => [
+            'type' => 'library',
+            'authors' => [['name' => $author, 'email' => $email, 'role' => 'Developer']],
+            'require' => array_merge([
                 'php' => $v['php'],
                 'filament/filament' => $v['filament'],
                 'spatie/laravel-package-tools' => '^1.16',
-            ],
+            ], $extraRequire),
             'require-dev' => [
                 'orchestra/testbench' => $v['testbench'],
                 'pestphp/pest' => '^3.0|^4.0',

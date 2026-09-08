@@ -5,6 +5,7 @@ namespace App\Commands;
 use App\Support\Scaffold;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 use LaravelZero\Framework\Commands\Command;
 
 class CreateCommand extends Command
@@ -24,6 +25,9 @@ class CreateCommand extends Command
         {--to-filament-version= : Filament major to end at when --all-branches is set (default: 5)}
         {--all-branches : scaffold sequential branches spanning --filament-version..--to-filament-version (2.x built off 1.x, 3.x off 2.x, ...) — e.g. --filament-version=3 covers 1.x->5.x, --filament-version=4 --to-filament-version=4 covers only 1.x->4.x}
         {--path= : target directory (default: ./<package> under cwd)}
+        {--namespace= : PSR-4 root namespace, e.g. "JeffersonGoncalves\Filament\Ban" (default: StudlyVendor\StudlyPackage)}
+        {--keywords= : comma-separated composer keywords (default: laravel,filament,filament-plugin,<package>)}
+        {--require= : extra runtime deps, comma-separated name:constraint}
         {--author= : defaults to `git config user.name`}
         {--email= : defaults to `git config user.email`}
         {--no-git : skip git init/commit}
@@ -75,12 +79,26 @@ class CreateCommand extends Command
         }
         $branchNames = array_column($plan, 'branch');
 
-        $namespace = Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
-        $serviceProvider = Scaffold::studly($package).'ServiceProvider';
-        $pluginClass = Scaffold::studly($package).'Plugin';
-        $title = Scaffold::studly($package);
+        // Casing and depth can't be derived from a kebab-case package name
+        // (filament-ban => FilamentBan, never Filament\Ban), so --namespace
+        // overrides it and its last segment drives the class names.
+        $namespace = trim((string) $this->option('namespace'), '\\')
+            ?: Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
+        $class = Str::afterLast($namespace, '\\');
+        $serviceProvider = $class.'ServiceProvider';
+        $pluginClass = $class.'Plugin';
+        $title = $class;
+
+        $keywords = array_values(array_filter(array_map('trim', explode(',', (string) $this->option('keywords')))));
+
+        $extraRequire = [];
+        foreach (array_filter(array_map('trim', explode(',', (string) $this->option('require')))) as $dep) {
+            [$name, $constraint] = array_pad(explode(':', $dep, 2), 2, '*');
+            $extraRequire[trim($name)] = trim($constraint);
+        }
 
         $author = $this->option('author') ?: trim((string) Process::run('git config --get user.name')->output()) ?: 'Jefferson Gonçalves';
+        $email = $this->option('email') ?: trim((string) Process::run('git config --get user.email')->output());
         $year = date('Y');
 
         $dir = $this->option('path') ?: getcwd().DIRECTORY_SEPARATOR.$package;
@@ -132,7 +150,11 @@ class CreateCommand extends Command
                 $gitRun("checkout -q -b {$branch}");
             }
 
-            $write('composer.json', json_encode(Scaffold::filamentComposerJson($vendor, $package, $namespace, $serviceProvider, $description, $major), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n", force: true);
+            $composerJson = Scaffold::filamentComposerJson(
+                $vendor, $package, $namespace, $serviceProvider, $description, $major,
+                author: $author, email: $email, keywords: $keywords, extraRequire: $extraRequire,
+            );
+            $write('composer.json', json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n", force: true);
             $write('.github/workflows/tests.yml', Scaffold::testsYml($branch, $major), force: true);
 
             if (! $dryRun) {
