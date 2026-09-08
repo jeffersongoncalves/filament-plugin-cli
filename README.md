@@ -100,9 +100,19 @@ The default is the nested shape: the `filament-` prefix moves into its own segme
 | `jeffersongoncalves/filament-ban` | `JeffersonGoncalves\Filament\Ban` | `BanServiceProvider`, `BanPlugin` |
 | `jeffersongoncalves/filament-cep-field` | `JeffersonGoncalves\Filament\CepField` | `CepFieldServiceProvider`, `CepFieldPlugin` |
 
-Vendor slugs are studly-cased, with `jeffersongoncalves` → `JeffersonGoncalves` and `jeffersonsimaogoncalves` → `JeffersonSimaoGoncalves` mapped explicitly (`Scaffold::VENDOR_NAMESPACES`) since studly can't see those word boundaries. The config filename stays the full slug (`config/filament-ban.php`) to match `spatie/laravel-package-tools`' `shortName()`.
+Both halves are studly-cased, which cannot see camel-case boundaries inside a single lowercase word (`jeffersongoncalves` → `Jeffersongoncalves`). Teach it once in `~/.package/vendornamespace.json`, shared with `laravel-package-cli`:
 
-Pass `--namespace` only to opt out — an older plugin on the flat `JeffersonGoncalves\FilamentBan` shape, or a vendor outside the map.
+```json
+{
+    "jeffersongoncalves": "JeffersonGoncalves"
+}
+```
+
+With that entry, `jeffersongoncalves/filament-ban` derives `JeffersonGoncalves\Filament\Ban` with no flags at all. Lookups are per whole slug and case-insensitive; unlisted slugs fall back to studly. See [laravel-zero-package-scaffold](https://github.com/jeffersongoncalves/laravel-zero-package-scaffold) for the file's full contract.
+
+The config filename stays the full slug (`config/filament-ban.php`) to match `spatie/laravel-package-tools`' `shortName()`.
+
+Pass `--namespace` only to opt out — an older plugin on the flat `JeffersonGoncalves\FilamentBan` shape, or a one-off you don't want in the shared file.
 
 Add a version branch to a plugin repo that already exists (the existing `composer.json` is kept — only the `php`, `filament/filament` and `orchestra/testbench` constraints move):
 
