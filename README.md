@@ -83,14 +83,26 @@ filament-plugin create jeffersongoncalves/filament-settings "Runtime settings pa
 filament-plugin create jeffersongoncalves/filament-settings "Runtime settings panel for Filament" --all-branches --filament-version=4
 ```
 
-Explicit namespace, keywords and dependencies (nothing the slug can reveal):
+Keywords and dependencies (the namespace already comes out right by default):
 
 ```bash
 filament-plugin create jeffersongoncalves/filament-ban "Ban and unban any Eloquent model from Filament tables" \
-  --namespace="JeffersonGoncalves\Filament\Ban" \
   --keywords="laravel,filament,filament-plugin,ban,bannable" \
   --require="cybercog/laravel-ban:^4.10"
 ```
+
+### Namespace
+
+The default is the nested shape: the `filament-` prefix moves into its own segment, so the classes don't repeat it.
+
+| Package | Namespace | Classes |
+|---------|-----------|---------|
+| `jeffersongoncalves/filament-ban` | `JeffersonGoncalves\Filament\Ban` | `BanServiceProvider`, `BanPlugin` |
+| `jeffersongoncalves/filament-cep-field` | `JeffersonGoncalves\Filament\CepField` | `CepFieldServiceProvider`, `CepFieldPlugin` |
+
+Vendor slugs are studly-cased, with `jeffersongoncalves` → `JeffersonGoncalves` and `jeffersonsimaogoncalves` → `JeffersonSimaoGoncalves` mapped explicitly (`Scaffold::VENDOR_NAMESPACES`) since studly can't see those word boundaries. The config filename stays the full slug (`config/filament-ban.php`) to match `spatie/laravel-package-tools`' `shortName()`.
+
+Pass `--namespace` only to opt out — an older plugin on the flat `JeffersonGoncalves\FilamentBan` shape, or a vendor outside the map.
 
 Add a version branch to a plugin repo that already exists (the existing `composer.json` is kept — only the `php`, `filament/filament` and `orchestra/testbench` constraints move):
 
@@ -107,7 +119,7 @@ filament-plugin branch jeffersongoncalves/filament-settings --branch=2.x --filam
 | `--to-filament-version=5` | Filament major to end at when `--all-branches` is set (default `5`); must be `>= --filament-version` |
 | `--all-branches` | Scaffold sequential branches (`1.x`, `2.x`, ...) spanning `--filament-version..--to-filament-version` |
 | `--path=DIR` | Target directory (default: `./<package>` under the current directory) |
-| `--namespace=NS` | PSR-4 root namespace, e.g. `"JeffersonGoncalves\Filament\Ban"`. Its last segment also drives the Service Provider, Plugin class and README title. Default: `StudlyVendor\StudlyPackage` — use it whenever the slug can't reveal the real casing/depth (`filament-ban` → `FilamentBan`, never `Filament\Ban`) |
+| `--namespace=NS` | PSR-4 root namespace override, e.g. `"JeffersonGoncalves\Filament\Ban"`. Its last segment also drives the Service Provider, Plugin class and README title. Defaults to the standard nested shape (see below) — only pass it for a repo that predates the convention |
 | `--keywords=LIST` | Comma-separated `composer.json` keywords (default: `laravel,filament,filament-plugin,<package>`) |
 | `--require=LIST` | Extra runtime dependencies, comma-separated `name:constraint` |
 | `--author="Name"` | Defaults to `git config user.name` |

@@ -28,9 +28,37 @@ class Scaffold
         return ($index + 1).'.x';
     }
 
+    /**
+     * Vendor slugs whose camel-case boundaries studly() cannot see:
+     * jeffersongoncalves reads as one lowercase word, so it would become
+     * Jeffersongoncalves. Anything unlisted falls back to studly().
+     */
+    public const VENDOR_NAMESPACES = [
+        'jeffersongoncalves' => 'JeffersonGoncalves',
+        'jeffersonsimaogoncalves' => 'JeffersonSimaoGoncalves',
+    ];
+
     public static function studly(string $value): string
     {
         return str_replace(['-', '_', ' '], '', ucwords(str_replace(['-', '_'], ' ', $value)));
+    }
+
+    public static function vendorNamespace(string $vendor): string
+    {
+        return self::VENDOR_NAMESPACES[strtolower($vendor)] ?? self::studly($vendor);
+    }
+
+    /**
+     * The standard plugin namespace is nested under a Filament segment:
+     * filament-ban => JeffersonGoncalves\Filament\Ban, so the classes read
+     * BanServiceProvider/BanPlugin rather than repeating the Filament prefix.
+     * Override the whole thing with --namespace when a repo predates this.
+     */
+    public static function rootNamespace(string $vendor, string $package): string
+    {
+        $name = self::studly(preg_replace('/^filament-/', '', $package));
+
+        return self::vendorNamespace($vendor).'\\Filament\\'.($name ?: 'Plugin');
     }
 
     public static function license(string $author, string $year): string

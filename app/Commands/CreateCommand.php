@@ -79,11 +79,12 @@ class CreateCommand extends Command
         }
         $branchNames = array_column($plan, 'branch');
 
-        // Casing and depth can't be derived from a kebab-case package name
-        // (filament-ban => FilamentBan, never Filament\Ban), so --namespace
-        // overrides it and its last segment drives the class names.
+        // Defaults to the standard nested shape (filament-ban =>
+        // JeffersonGoncalves\Filament\Ban); --namespace overrides it for repos
+        // that predate the convention. Either way the last segment drives the
+        // class names.
         $namespace = trim((string) $this->option('namespace'), '\\')
-            ?: Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
+            ?: Scaffold::rootNamespace($vendor, $package);
         $class = Str::afterLast($namespace, '\\');
         $serviceProvider = $class.'ServiceProvider';
         $pluginClass = $class.'Plugin';

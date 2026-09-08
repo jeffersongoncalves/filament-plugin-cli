@@ -76,6 +76,27 @@ it('rejects a to-filament-version lower than filament-version', function () {
     ])->assertExitCode(1);
 });
 
+it('defaults to the nested Vendor\\Filament\\Name namespace', function () {
+    $dir = sys_get_temp_dir().'/filament-plugin-cli-test-'.uniqid();
+
+    $this->artisan('create', [
+        'vendor-package' => 'jeffersongoncalves/filament-cep-field',
+        '--path' => $dir,
+        '--filament-version' => '5',
+        '--no-git' => true,
+    ])->assertExitCode(0);
+
+    $composer = json_decode(file_get_contents($dir.'/composer.json'), true);
+
+    expect($composer['autoload']['psr-4'])->toHaveKey('JeffersonGoncalves\\Filament\\CepField\\')
+        ->and($composer['extra']['laravel']['providers'])->toBe(['JeffersonGoncalves\\Filament\\CepField\\CepFieldServiceProvider'])
+        ->and(is_file($dir.'/src/CepFieldServiceProvider.php'))->toBeTrue()
+        ->and(is_file($dir.'/src/CepFieldPlugin.php'))->toBeTrue()
+        ->and(is_file($dir.'/config/filament-cep-field.php'))->toBeTrue();
+
+    File::deleteDirectory($dir);
+});
+
 it('honours --namespace, --keywords and --require', function () {
     $dir = sys_get_temp_dir().'/filament-plugin-cli-test-'.uniqid();
 

@@ -5,6 +5,7 @@ namespace App\Commands;
 use App\Support\Scaffold;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 use LaravelZero\Framework\Commands\Command;
 
 class BranchCommand extends Command
@@ -55,8 +56,10 @@ class BranchCommand extends Command
             return self::FAILURE;
         }
 
-        $namespace = Scaffold::studly($vendor).'\\'.Scaffold::studly($package);
-        $serviceProvider = Scaffold::studly($package).'ServiceProvider';
+        // Only used when the repo has no composer.json to merge over — an
+        // existing one keeps its own autoload/extra untouched.
+        $namespace = Scaffold::rootNamespace($vendor, $package);
+        $serviceProvider = Str::afterLast($namespace, '\\').'ServiceProvider';
 
         $git = [];
         $gitRun = function (string $cmd) use ($dir, $dryRun, &$git): void {
