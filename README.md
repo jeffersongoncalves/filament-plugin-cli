@@ -9,7 +9,7 @@
 Scaffold new open-source Filament plugins with **multi-branch** git already configured, built with [Laravel Zero](https://laravel-zero.com/). Fully non-interactive — every input is an argument or a flag, so it's meant to be driven by an AI agent (e.g. Claude Code's `filament-plugin-creator` skill) as much as by a human.
 
 <p align="center">
-  <a href="https://github.com/jeffersongoncalves/filament-plugin-cli/actions"><img src="https://github.com/jeffersongoncalves/filament-plugin-cli/actions/workflows/run-tests.yml/badge.svg" alt="Tests" /></a>
+  <a href="https://github.com/jeffersongoncalves/filament-plugin-cli/actions"><img src="https://github.com/jeffersongoncalves/filament-plugin-cli/actions/workflows/tests.yml/badge.svg" alt="Tests" /></a>
   <a href="https://packagist.org/packages/jeffersongoncalves/filament-plugin-cli"><img src="https://img.shields.io/packagist/dt/jeffersongoncalves/filament-plugin-cli" alt="Total Downloads" /></a>
   <a href="https://github.com/jeffersongoncalves/filament-plugin-cli/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jeffersongoncalves/filament-plugin-cli" alt="License" /></a>
   <img src="https://img.shields.io/badge/php-%3E%3D8.2-8892BF" alt="PHP 8.2+" />
