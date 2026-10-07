@@ -26,6 +26,8 @@ Scaffold new open-source Filament plugins with **multi-branch** git already conf
 - CI workflows: branch-scoped `tests.yml`, plus `pint.yml`/`phpstan.yml`/`update-changelog.yml` covering every branch scaffolded
 - `git init`, branch checkout(s), and a commit per branch
 
+Once the plugin is written, `filament-plugin verify` runs Pint/PHPStan/Pest on every branch and `filament-plugin publish` takes it to GitHub releases and Packagist.
+
 It deliberately does **not** write the plugin's actual logic (Plugin/Service Provider bindings, components, README body, tests, banner) — that's judgment work left to whoever (human or agent) is building the plugin on top of this scaffold.
 
 Branch **naming** is always sequential (`1.x`, `2.x`, `3.x`, ...) — which Filament major each one targets is controlled separately via `--filament-version`/`--to-filament-version`, so a plugin doesn't have to start at Filament 3:
@@ -146,6 +148,48 @@ filament-plugin branch jeffersongoncalves/filament-settings --branch=2.x --filam
 | `--path=DIR` | Existing plugin repo (required) |
 | `--from=1.x` | Branch to branch off (default: current `HEAD`) |
 | `--dry-run` | Print the planned actions, write nothing |
+
+Check every version branch before publishing — `composer update`, Pint, PHPStan (result cache cleared first) and Pest per branch, then a summary table. Exits non-zero if anything failed, and always returns to the branch you started on:
+
+```bash
+filament-plugin verify --path=./filament-settings
+filament-plugin verify --branches=2.x,3.x
+# a dependency not on Packagist yet, installed from a sibling folder (composer.json is never touched)
+filament-plugin verify --local=jeffersongoncalves/laravel-settings=../laravel-settings
+```
+
+Publish a verified plugin — create the GitHub repo (wiki/projects off, topics, no homepage), push every `N.x` branch, make the highest one the default branch, cut `N.0.0` on each branch (only the highest one `--latest`) and submit to Packagist. Safe to re-run: anything that already exists is skipped.
+
+```bash
+filament-plugin publish jeffersongoncalves/filament-settings --path=./filament-settings --topics=laravel,filament,settings
+# hold the releases until the package this plugin depends on is on Packagist
+filament-plugin publish jeffersongoncalves/filament-settings --wait-for=jeffersongoncalves/laravel-settings:1.0.0
+```
+
+### `verify` options
+
+| Option | Description |
+|--------|-------------|
+| `--path=DIR` | Plugin repo (default: current directory); the working tree must be clean |
+| `--branches=LIST` | Comma-separated branches to check (default: every `N.x` branch) |
+| `--local=vendor/package=PATH` | Install an unpublished dependency from a folder, through a throwaway `composer.verify.json` (repeatable) |
+| `--fix` | Run Pint in fix mode instead of `--test` |
+
+### `publish` options
+
+| Option | Description |
+|--------|-------------|
+| `--path=DIR` | Plugin repo (default: current directory) |
+| `--description=TEXT` | GitHub description (default: `composer.json` description of the highest branch) |
+| `--topics=LIST` | Comma-separated GitHub topics |
+| `--wait-for=vendor/package:version` | Poll Packagist until that version exists before releasing (repeatable) |
+| `--wait-timeout=900` | Seconds to wait for each `--wait-for` package |
+| `--notes=TEXT` | Release notes (default: `First release for Filament N.x.`) |
+| `--private` | Create a private repository |
+| `--no-packagist` | Skip `packagist submit` |
+| `--dry-run` | Print the commands, run nothing |
+
+`publish` needs the `gh` CLI (authenticated) and, unless `--no-packagist`, the [`packagist` CLI](https://github.com/jeffersongoncalves/packagist-cli).
 
 Every argument/option is designed for scripted, non-interactive invocation — no prompts are ever shown.
 
