@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-10-07
+
+### Build
+
+- **deps:** Bump orhun/git-cliff-action in the all-actions group
+- **deps:** Bump orhun/git-cliff-action in the actions-deps group
+
+### CI/CD
+
+- Pass release version input through env
+- Standardize tests workflow
+- Remove run-tests.yml (replaced by tests.yml)
+- Standardize dependabot config
+- Standardize tests workflow
+- Auto-merge dependabot github-actions minor/patch
+
+### Documentation
+
+- Point tests badge to tests.yml
+- Fix banner layout
+
+### Features
+
+- Add verify and publish commands
+
 ## [1.0.9] - 2026-09-08
 
 ### Bug Fixes
