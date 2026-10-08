@@ -103,7 +103,13 @@ class VerifyCommand extends Command
             // Testbench compiles views into vendor/: after switching branches they belong to another Filament.
             File::delete(File::glob($dir.'/vendor/orchestra/testbench-core/laravel/storage/framework/views/*.php') ?: []);
 
-            $results['pint'] = $this->step($dir, $this->option('fix') ? [$php, 'vendor/bin/pint'] : [$php, 'vendor/bin/pint', '--test'], $env);
+            if ($this->option('fix')) {
+                $before = $this->changedFiles($dir);
+                $results['pint'] = $this->step($dir, [$php, 'vendor/bin/pint'], $env);
+                $this->commitPintFixes($dir, $branch, array_values(array_diff($this->changedFiles($dir), $before)));
+            } else {
+                $results['pint'] = $this->step($dir, [$php, 'vendor/bin/pint', '--test'], $env);
+            }
             Process::path($dir)->env($env)->run([$php, 'vendor/bin/phpstan', 'clear-result-cache', '-q']);
             $results['phpstan'] = $this->step($dir, [$php, 'vendor/bin/phpstan', 'analyse', '--no-progress', '--memory-limit=1G'], $env);
             $results['pest'] = $this->step($dir, [$php, 'vendor/bin/pest'], $env);
@@ -114,6 +120,31 @@ class VerifyCommand extends Command
         }
 
         return $results;
+    }
+
+    /**
+     * @return list<string> tracked files with uncommitted changes
+     */
+    private function changedFiles(string $dir): array
+    {
+        return array_values(array_filter(explode("\n", trim(Process::path($dir)->run(['git', 'diff', '--name-only'])->output()))));
+    }
+
+    /**
+     * Pint --fix rewrites files on this branch: commit them here, otherwise the next checkout would carry
+     * them over to the other branches.
+     *
+     * @param  list<string>  $files
+     */
+    private function commitPintFixes(string $dir, string $branch, array $files): void
+    {
+        if ($files === []) {
+            return;
+        }
+
+        Process::path($dir)->run(['git', 'add', '--', ...$files]);
+        Process::path($dir)->run(['git', 'commit', '-q', '-m', 'style: apply Pint']);
+        $this->components->info('Committed Pint fixes on '.$branch.' ('.count($files).' files, not pushed)');
     }
 
     /**

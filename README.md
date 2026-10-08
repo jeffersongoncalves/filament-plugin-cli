@@ -173,7 +173,7 @@ filament-plugin publish jeffersongoncalves/filament-settings --wait-for=jefferso
 | `--path=DIR` | Plugin repo (default: current directory); the working tree must be clean |
 | `--branches=LIST` | Comma-separated branches to check (default: every `N.x` branch) |
 | `--local=vendor/package=PATH` | Install an unpublished dependency from a folder, through a throwaway `composer.verify.json` (repeatable) |
-| `--fix` | Run Pint in fix mode instead of `--test` |
+| `--fix` | Run Pint in fix mode instead of `--test`; its changes are committed on their own branch (`style: apply Pint`, not pushed) so they don't follow the checkout to the next branch |
 
 ### `publish` options
 

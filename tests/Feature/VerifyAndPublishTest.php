@@ -84,6 +84,20 @@ it('fails when a check fails on a branch', function () {
     File::deleteDirectory($dir);
 });
 
+it('commits Pint --fix changes on their own branch so they do not leak into the next one', function () {
+    fakeGit(['*git*diff*--name-only*' => Process::sequence(['', "src/Plugin.php\n", '', ''])]);
+    $dir = fakeRepo();
+
+    $this->artisan('verify', ['--path' => $dir, '--branches' => '1.x,2.x', '--fix' => true])->assertExitCode(0);
+
+    assertRan('vendor/bin/pint');
+    assertNotRan('pint --test');
+    assertRan('git add -- src/Plugin.php');
+    Process::assertRanTimes(fn (PendingProcess $p) => str_contains(commandLine($p), 'git commit -q -m style: apply Pint'), 1);
+
+    File::deleteDirectory($dir);
+});
+
 it('refuses to run on a dirty working tree', function () {
     fakeGit(['*git*status*' => " M src/Plugin.php\n"]);
     $dir = fakeRepo();
