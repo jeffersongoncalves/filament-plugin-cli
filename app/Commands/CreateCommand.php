@@ -181,12 +181,9 @@ class CreateCommand extends Command
         $this->newLine();
         $this->components->info('Next steps:');
         foreach ([
-            'rm -f composer.lock && composer install',
-            'vendor/bin/pest',
-            'vendor/bin/phpstan analyse',
-            'vendor/bin/pint',
-            "gh repo create {$vendor}/{$package} --public --source={$dir} --remote=origin --push",
-            'set the default branch on GitHub to the lowest scaffolded branch (e.g. '.$branchNames[0].')',
+            'write the plugin, commit it on every branch',
+            "filament-plugin verify --path={$dir}",
+            "filament-plugin publish {$vendor}/{$package} --path={$dir} --topics=laravel,filament,filament-plugin",
         ] as $step) {
             $this->line("  - {$step}");
         }

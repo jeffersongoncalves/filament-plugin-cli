@@ -118,7 +118,9 @@ it('publishes: repo, branches, default branch, releases with only the highest la
     assertRan('gh repo create acme/filament-thing --public --source . --remote origin --description A plugin');
     assertRan('--add-topic filament --add-topic laravel');
     assertNotRan('--homepage');
-    assertRan('git push -u origin 1.x 2.x 3.x');
+    assertRan('git push -u origin 1.x');
+    assertRan('git push -u origin 3.x');
+    assertNotRan('git push -u origin 1.x 2.x');
     assertRan('--default-branch 3.x');
     assertRan('gh release create 1.0.0 --repo acme/filament-thing --target 1.x --title 1.0.0 --latest=false');
     assertRan('gh release create 3.0.0 --repo acme/filament-thing --target 3.x --title 3.0.0 --latest --notes First release for Filament 5.x.');

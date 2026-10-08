@@ -61,7 +61,7 @@ class PublishCommand extends Command
 
         $steps = [
             fn () => $this->ensureRepo($dir, $package, $highest),
-            fn () => $this->exec($dir, ['git', 'push', '-u', 'origin', ...$branches]),
+            fn () => $this->pushBranches($dir, $branches),
             fn () => $this->exec($dir, ['gh', 'repo', 'edit', $package, '--default-branch', $highest]),
             fn () => $this->waitForDependencies($packagist),
             fn () => $this->release($dir, $package, $branches, $highest),
@@ -100,6 +100,22 @@ class PublishCommand extends Command
         }
 
         return $this->exec($dir, $edit);
+    }
+
+    /**
+     * One push per branch: GitHub fires push workflows (Tests, PHPStan) only for the first ref of a multi-ref push.
+     *
+     * @param  list<string>  $branches
+     */
+    private function pushBranches(string $dir, array $branches): bool
+    {
+        foreach ($branches as $branch) {
+            if (! $this->exec($dir, ['git', 'push', '-u', 'origin', $branch])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function waitForDependencies(Packagist $packagist): bool
