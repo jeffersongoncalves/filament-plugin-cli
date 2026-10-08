@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-10-08
+
+### Bug Fixes
+
+- Push each branch separately in publish
+
 ## [1.1.0] - 2026-10-07
 
 ### Build
