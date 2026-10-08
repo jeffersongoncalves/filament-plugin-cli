@@ -132,6 +132,7 @@ it('publishes: repo, branches, default branch, releases with only the highest la
     assertRan('gh repo create acme/filament-thing --public --source . --remote origin --description A plugin');
     assertRan('--add-topic filament --add-topic laravel');
     assertNotRan('--homepage');
+    assertRan('gh api -X PUT repos/acme/filament-thing/immutable-releases');
     assertRan('git push -u origin 1.x');
     assertRan('git push -u origin 3.x');
     assertNotRan('git push -u origin 1.x 2.x');

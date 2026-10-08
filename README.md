@@ -158,7 +158,7 @@ filament-plugin verify --branches=2.x,3.x
 filament-plugin verify --local=jeffersongoncalves/laravel-settings=../laravel-settings
 ```
 
-Publish a verified plugin — create the GitHub repo (wiki/projects off, topics, no homepage), push every `N.x` branch, make the highest one the default branch, cut `N.0.0` on each branch (only the highest one `--latest`) and submit to Packagist. Safe to re-run: anything that already exists is skipped.
+Publish a verified plugin — create the GitHub repo (wiki/projects off, topics, no homepage, release immutability on), push every `N.x` branch, make the highest one the default branch, cut `N.0.0` on each branch (only the highest one `--latest`) and submit to Packagist. Safe to re-run: anything that already exists is skipped. GitHub's API can't set the social preview image, so the command ends with a reminder to upload the banner in the repo settings.
 
 ```bash
 filament-plugin publish jeffersongoncalves/filament-settings --path=./filament-settings --topics=laravel,filament,settings

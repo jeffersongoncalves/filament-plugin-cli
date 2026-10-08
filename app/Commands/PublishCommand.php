@@ -75,6 +75,8 @@ class PublishCommand extends Command
         }
 
         $this->components->info(($this->dryRun ? '[dry-run] ' : '')."{$package} published: ".implode(', ', $branches)." ({$highest} is latest).");
+        // GitHub's API can't set the social preview image; it has to be uploaded in Settings > Social preview.
+        $this->components->warn("Upload the banner as the social preview: https://github.com/{$package}/settings");
 
         return self::SUCCESS;
     }
@@ -99,7 +101,9 @@ class PublishCommand extends Command
             array_push($edit, '--add-topic', $topic);
         }
 
-        return $this->exec($dir, $edit);
+        // Release immutability before the first release, so every tag/asset is locked from the start.
+        return $this->exec($dir, $edit)
+            && $this->exec($dir, ['gh', 'api', '-X', 'PUT', "repos/{$package}/immutable-releases"]);
     }
 
     /**
