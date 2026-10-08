@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2026-10-08
+
+### Features
+
+- **publish:** Enable release immutability on the new repo
+
 ## [1.1.2] - 2026-10-08
 
 ### Bug Fixes
