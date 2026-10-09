@@ -22,8 +22,11 @@ class Packagist
             return false; // not indexed yet (404) or a transient error: the caller keeps polling
         }
 
+        // Tags may or may not carry a "v" prefix (v1.2.0 vs 1.2.0): compare without it on both sides.
+        $wanted = ltrim($version, 'vV');
+
         foreach ($data['packages'][$package] ?? [] as $release) {
-            if (($release['version'] ?? null) === $version) {
+            if (ltrim((string) ($release['version'] ?? ''), 'vV') === $wanted) {
                 return true;
             }
         }
