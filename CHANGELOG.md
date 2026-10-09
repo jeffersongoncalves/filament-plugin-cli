@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4] - 2026-10-09
+
+### Bug Fixes
+
+- **publish:** --wait-for matches versions with or without a v prefix
+
 ## [1.1.3] - 2026-10-08
 
 ### Features
