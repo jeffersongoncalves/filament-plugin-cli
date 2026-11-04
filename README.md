@@ -12,7 +12,7 @@ Scaffold new open-source Filament plugins with **multi-branch** git already conf
   <a href="https://github.com/jeffersongoncalves/filament-plugin-cli/actions"><img src="https://github.com/jeffersongoncalves/filament-plugin-cli/actions/workflows/tests.yml/badge.svg" alt="Tests" /></a>
   <a href="https://packagist.org/packages/jeffersongoncalves/filament-plugin-cli"><img src="https://img.shields.io/packagist/dt/jeffersongoncalves/filament-plugin-cli" alt="Total Downloads" /></a>
   <a href="https://github.com/jeffersongoncalves/filament-plugin-cli/blob/main/LICENSE"><img src="https://img.shields.io/github/license/jeffersongoncalves/filament-plugin-cli" alt="License" /></a>
-  <img src="https://img.shields.io/badge/php-%3E%3D8.2-8892BF" alt="PHP 8.2+" />
+  <img src="https://img.shields.io/badge/php-%3E%3D8.3-8892BF" alt="PHP 8.3+" />
 </p>
 
 ## What it does
@@ -40,7 +40,7 @@ Branch **naming** is always sequential (`1.x`, `2.x`, `3.x`, ...) — which Fila
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.3+
 - Git
 
 ## Installation
