@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-11-04
+
+### Bug Fixes
+
+- Pin PHP floor to 8.3 for Laravel Zero 13
+
+### Build
+
+- **deps:** Bump shivammathur/setup-php (#8)
+- **deps:** Bump stefanzweifel/git-auto-commit-action (#11)
+- **deps-dev:** Bump the composer-deps group with 3 updates
+
+### Other
+
+- Auto-assign issues and pull requests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 ## [1.1.4] - 2026-10-09
 
 ### Bug Fixes
