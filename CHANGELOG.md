@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-11-11
+
+### CI/CD
+
+- Verify PHAR asset and smoke-test build before publishing release
+- Exact version/asset checks, resume leftover draft release
+
 ## [1.2.0] - 2026-11-04
 
 ### Bug Fixes
