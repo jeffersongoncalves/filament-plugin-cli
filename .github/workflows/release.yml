@@ -45,7 +45,8 @@ jobs:
             IFS='.' read -r MA MI PA <<< "$LATEST"
             NEXT="${MA}.${MI}.$((PA + 1))"
           fi
-          while gh release view "v$NEXT" &>/dev/null; do
+          # Skip published versions only; a leftover draft (failed run) is resumed below.
+          while [ "$(gh release view "v$NEXT" --json isDraft -q .isDraft 2>/dev/null)" = "false" ]; do
             IFS='.' read -r MA MI PA <<< "$NEXT"
             NEXT="${MA}.${MI}.$((PA + 1))"
           done
@@ -86,6 +87,12 @@ jobs:
       - name: Build the PHAR with the release version
         run: php filament-plugin app:build filament-plugin --build-version=${{ steps.v.outputs.version }}
 
+      - name: Smoke-test the PHAR
+        run: |
+          GOT=$(php builds/filament-plugin --version --no-ansi | awk '{print $NF}')
+          [ "$GOT" = "${{ steps.v.outputs.version }}" ] \
+            || { echo "::error::PHAR reports '$GOT', expected '${{ steps.v.outputs.version }}'"; exit 1; }
+
       - name: Commit release artifacts to main
         id: commit
         uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7
@@ -99,13 +106,23 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Create draft tag and release at the release commit
+        # A draft left by a failed run (e.g. missing asset) is reused and retargeted
+        # instead of bumping the version; drafts have no tag yet, so this is safe.
         run: |
-          gh release create ${{ steps.v.outputs.tag }} \
-            --title "${{ steps.v.outputs.tag }}" \
-            --notes-file RELEASE_NOTES.md \
-            --target ${{ steps.sha.outputs.sha }} \
-            --draft \
-            --latest
+          TAG=${{ steps.v.outputs.tag }}
+          if [ "$(gh release view "$TAG" --json isDraft -q .isDraft 2>/dev/null)" = "true" ]; then
+            gh release edit "$TAG" \
+              --title "$TAG" \
+              --notes-file RELEASE_NOTES.md \
+              --target ${{ steps.sha.outputs.sha }}
+          else
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes-file RELEASE_NOTES.md \
+              --target ${{ steps.sha.outputs.sha }} \
+              --draft \
+              --latest
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -113,6 +130,9 @@ jobs:
         run: |
           cp builds/filament-plugin filament-plugin.phar
           gh release upload ${{ steps.v.outputs.tag }} filament-plugin.phar --clobber
+          # self-update needs this asset and immutability blocks adding it later (issue #14)
+          gh release view ${{ steps.v.outputs.tag }} --json assets -q '.assets[].name' | grep -qxF filament-plugin.phar \
+            || { echo "::error::filament-plugin.phar missing from ${{ steps.v.outputs.tag }}"; exit 1; }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
