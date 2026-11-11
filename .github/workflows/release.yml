@@ -86,6 +86,9 @@ jobs:
       - name: Build the PHAR with the release version
         run: php filament-plugin app:build filament-plugin --build-version=${{ steps.v.outputs.version }}
 
+      - name: Smoke-test the PHAR
+        run: php builds/filament-plugin --version | grep -F "${{ steps.v.outputs.version }}"
+
       - name: Commit release artifacts to main
         id: commit
         uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7
@@ -113,6 +116,9 @@ jobs:
         run: |
           cp builds/filament-plugin filament-plugin.phar
           gh release upload ${{ steps.v.outputs.tag }} filament-plugin.phar --clobber
+          # self-update needs this asset and immutability blocks adding it later (issue #14)
+          gh release view ${{ steps.v.outputs.tag }} --json assets -q '.assets[].name' | grep -qx filament-plugin.phar \
+            || { echo "::error::filament-plugin.phar missing from ${{ steps.v.outputs.tag }}"; exit 1; }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
