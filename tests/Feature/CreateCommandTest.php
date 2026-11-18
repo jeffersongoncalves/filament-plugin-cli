@@ -92,7 +92,8 @@ it('defaults to the nested Vendor\\Filament\\Name namespace', function () {
         ->and($composer['extra']['laravel']['providers'])->toBe(['Jeffersongoncalves\\Filament\\CepField\\CepFieldServiceProvider'])
         ->and(is_file($dir.'/src/CepFieldServiceProvider.php'))->toBeTrue()
         ->and(is_file($dir.'/src/CepFieldPlugin.php'))->toBeTrue()
-        ->and(is_file($dir.'/config/filament-cep-field.php'))->toBeTrue();
+        ->and(is_file($dir.'/config/filament-cep-field.php'))->toBeTrue()
+        ->and(file_get_contents($dir.'/.github/workflows/dependabot-auto-merge.yml'))->toContain('--match-head-commit');
 
     File::deleteDirectory($dir);
 });
