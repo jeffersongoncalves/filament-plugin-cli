@@ -2190,16 +2190,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-zero-package-scaffold",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold.git",
-                "reference": "78e32042dfe2666d06f98817c25430ab79a43739"
+                "reference": "13b9c23b1b01af11de42444194b8024bfd2c274e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-zero-package-scaffold/zipball/78e32042dfe2666d06f98817c25430ab79a43739",
-                "reference": "78e32042dfe2666d06f98817c25430ab79a43739",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-zero-package-scaffold/zipball/13b9c23b1b01af11de42444194b8024bfd2c274e",
+                "reference": "13b9c23b1b01af11de42444194b8024bfd2c274e",
                 "shasum": ""
             },
             "require": {
@@ -2207,7 +2207,7 @@
             },
             "require-dev": {
                 "laravel/pint": "^1.25",
-                "pestphp/pest": "^3.8|^4.1",
+                "pestphp/pest": "^5.3.5",
                 "phpstan/phpstan": "^2.1"
             },
             "type": "library",
@@ -2237,7 +2237,7 @@
                 "scaffold"
             ],
             "support": {
-                "source": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold/tree/1.0.2"
+                "source": "https://github.com/jeffersongoncalves/laravel-zero-package-scaffold/tree/1.1.0"
             },
             "funding": [
                 {
@@ -2245,7 +2245,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-10T16:30:13+00:00"
+            "time": "2026-11-18T20:19:55+00:00",
+            "published-time": "2026-11-18T20:20:00+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-zero-self-update",
@@ -8839,5 +8840,5 @@
     "platform-overrides": {
         "php": "8.3.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

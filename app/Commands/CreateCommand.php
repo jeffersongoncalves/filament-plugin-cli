@@ -332,5 +332,6 @@ class CreateCommand extends Command
         $write('.github/workflows/pint.yml', Scaffold::workflowPint([...$branchNames, 'main']));
         $write('.github/workflows/phpstan.yml', Scaffold::workflowPhpstan([...$branchNames, 'main']));
         $write('.github/workflows/update-changelog.yml', Scaffold::workflowChangelog());
+        $write('.github/workflows/dependabot-auto-merge.yml', Scaffold::workflowDependabotAutoMerge());
     }
 }
